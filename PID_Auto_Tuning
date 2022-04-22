@@ -1,8 +1,16 @@
 class PIDAutoTuning(PIDController):
-  def __init__(self, out_min, out_max):
-    super().__init()
+  def __init__(self, setpoint, out_min, out_max):
+    super().__init(setpoint)
     self.out_min = out_min
     self.out_max = out_max
   
-  def ziegler_nichols(self):
-    return 0
+  def ziegler_nichols(self, sensor, step_size = 0.1, error_range = 0.1):
+    self.kp = 1
+    self.ki = 0
+    self.kd = 0
+    last_pass = sensor.get_sensor_value()
+    self.P([sensor.get_sensor_value()], [])
+    current_pass = sensor.get_sensor_value()
+    while abs(current_pass - last_pass) > error_range:
+      self.P([current_pass], [])
+    
