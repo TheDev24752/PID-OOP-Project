@@ -1,0 +1,8 @@
+class PIDAutoTuning(PIDController):
+  def __init__(self, out_min, out_max):
+    super().__init()
+    self.out_min = out_min
+    self.out_max = out_max
+  
+  def ziegler_nichols(self):
+    return 0
