@@ -2,11 +2,11 @@ import calculus
 
 class PIDController:
   
-  def __init__():
+  def __init__(self, setpoint = None):
     self.kp = 1
     self.ki = 0
     self.kd = 0
-    self.setpoint = None
+    self.setpoint = setpoint
   
   def P(sensor_val, times):
     return self.kp * (sensor_val[-1] - self.setpoint)
