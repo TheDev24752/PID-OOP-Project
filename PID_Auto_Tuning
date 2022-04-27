@@ -4,13 +4,22 @@ class PIDAutoTuning(PIDController):
     self.out_min = out_min
     self.out_max = out_max
   
-  def ziegler_nichols(self, sensor, step_size = 0.1, error_range = 0.1):
+  def ziegler_nichols_PI(self, sensor, output, step_size = 0.1, error_range = 0.1): # pass through sensor object, output method, optionally step size and error
     self.kp = 1
     self.ki = 0
     self.kd = 0
+    settle = -100000
+    last_settle = 0
     last_pass = sensor.get_sensor_value()
     self.P([sensor.get_sensor_value()], [])
     current_pass = sensor.get_sensor_value()
-    while abs(current_pass - last_pass) > error_range:
-      self.P([current_pass], [])
-    
+    while True:
+      while abs(current_pass - last_pass) > error_range:  # let system settle using just proportional gain
+        output(self.P([current_pass], []))
+        last_pass = current_pass
+        current_pass = sesnor.get_sensor_value()
+      last_settle = settle
+      settle = current_pass
+      if abs(settle - last_settle) < error_range: # check whether system consistently oscillates here
+        break
+      self.kp += step_size
