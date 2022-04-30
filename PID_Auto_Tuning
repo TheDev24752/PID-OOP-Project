@@ -1,3 +1,5 @@
+from datetime import datetime
+
 class PIDAutoTuning(PIDController):
   def __init__(self, setpoint, out_min, out_max):
     super().__init(setpoint)
@@ -8,18 +10,35 @@ class PIDAutoTuning(PIDController):
     self.kp = 1
     self.ki = 0
     self.kd = 0
-    settle = -100000
-    last_settle = 0
-    last_pass = sensor.get_sensor_value()
-    self.P([sensor.get_sensor_value()], [])
-    current_pass = sensor.get_sensor_value()
+    max1 = sensor.get_sensor_value()
+    min = 0
+    max2 = 0
+    t1 = 0
+    t2 = 0
+    output(self.P([sensor.get_sensor_value()], []))
     while True:
-      while abs(current_pass - last_pass) > error_range:  # let system settle using just proportional gain
-        output(self.P([current_pass], []))
-        last_pass = current_pass
-        current_pass = sesnor.get_sensor_value()
-      last_settle = settle
-      settle = current_pass
-      if abs(settle - last_settle) < error_range: # check whether system consistently oscillates here
+      for i in range(3): # run system for 3 periods, so that it can settle into oscillation
+        m = sensor.get_sensor_value()
+        while max1 <= m:
+          max1 = m
+          m = sensor.get_sensor_value()
+        min = m
+        t1 = datetime.now().time().hour * 24 * 60 * 60 + datetime.now().time().minute * 60 * 60 + datetime.now().time().second + datetime.now().time().microsecond / 1000000
+        m = sensor.get_sensor_value()
+        while min >= m:
+          min = m
+          m = sensor.get_sensor_value()
+        max2 = m
+        m = sensor.get_sensor_value()
+        while max2 <= m:
+          max2 = m
+          t2 = datetime.now().time().hour * 24 * 60 * 60 + datetime.now().time().minute * 60 * 60 + datetime.now().time().second + datetime.now().time().microsecond / 1000000
+          m = sensor.get_sensor_value()
+      if max1 >= max2:  # Check that system oscillates constantly
         break
       self.kp += step_size
+    ku = self.kp
+    tu = t2 - t1
+    self.kp = 0.6 * ku
+    self.ki = 1.2 * ku / tu
+    self.kd = 0.075 * ku * tu
