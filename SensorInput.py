@@ -2,7 +2,7 @@ import pyautogui
 
 class SensorInput:
   
-  def __init__():
+  def __init__(self):
     self.pin_location
   
   def get_sensor_value():

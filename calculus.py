@@ -5,6 +5,5 @@ def riemann(data, dx):
 
     return sigma
 
-
 def derivative(y1, y2, dx):
     return (y2 - y1) / dx
