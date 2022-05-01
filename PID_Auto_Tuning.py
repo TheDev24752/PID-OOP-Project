@@ -3,12 +3,11 @@ from PIDController import PIDController
 
 
 class PIDAutoTuning(PIDController):
-  def __init__(self, setpoint, out_min, out_max):
+
+  def __init__(self, setpoint):
     super().__init__(setpoint)
-    self.out_min = out_min
-    self.out_max = out_max
   
-  def ziegler_nichols_PI(self, sensor, output, step_size = 0.1, error_range = 0.1): # pass through sensor object, output method, optionally step size and error
+  def ziegler_nichols_PID(self, sensor, output, step_size = 0.1, error_range = 0.1): # pass through sensor object, output method, optionally step size and error
     self.kp = 1
     self.ki = 0
     self.kd = 0
