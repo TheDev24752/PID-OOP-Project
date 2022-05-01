@@ -4,7 +4,7 @@ from PIDController import PIDController
 
 class PIDAutoTuning(PIDController):
   def __init__(self, setpoint, out_min, out_max):
-    super().__init(setpoint)
+    super().__init__(setpoint)
     self.out_min = out_min
     self.out_max = out_max
   
