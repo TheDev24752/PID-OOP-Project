@@ -11,14 +11,20 @@ class PIDAutoTuning(PIDController):
     self.kp = 1
     self.ki = 0
     self.kd = 0
-    max1 = sensor.get_sensor_value()
-    min = 0
+    max1 = 0
+    min = sensor.get_sensor_value()
     max2 = 0
     t1 = 0
     t2 = 0
-    output(self.P([sensor.get_sensor_value()], []))
     while True:
-      for i in range(3): # run system for 3 periods, so that it can settle into oscillation
+      for i in range(2): # run system for 3 periods, so that it can settle into oscillation
+        m = sensor.get_sensor_value()
+        output(self.P([m], []))
+        while min >= m: # make sure the graph is going up before we find the maximum
+          min = m
+          m = sensor.get_sensor_value()
+          output(self.P([m], []))
+        max1 = m
         m = sensor.get_sensor_value()
         output(self.P([m], []))
         while max1 <= m:
