@@ -2,11 +2,11 @@ import pyautogui
 
 class SensorInput:
   
-  def __init__(self):
-    self.pin_location
+  def __init__(self, input):
+    self.input = input
   
   def get_sensor_value():
-    return pyautogui.position()[1]  #gets the mouse's y-position
+    return self.input()
 
     # return 1
   
