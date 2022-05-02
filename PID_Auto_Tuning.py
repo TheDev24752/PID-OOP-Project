@@ -20,21 +20,27 @@ class PIDAutoTuning(PIDController):
     while True:
       for i in range(3): # run system for 3 periods, so that it can settle into oscillation
         m = sensor.get_sensor_value()
+        output(self.P([m], []))
         while max1 <= m:
           max1 = m
           m = sensor.get_sensor_value()
+          output(self.P([m], []))
         min = m
         t1 = datetime.now().time().hour * 24 * 60 * 60 + datetime.now().time().minute * 60 * 60 + datetime.now().time().second + datetime.now().time().microsecond / 1000000
         m = sensor.get_sensor_value()
+        output(self.P([m], []))
         while min >= m:
           min = m
           m = sensor.get_sensor_value()
+          output(self.P([m], []))
         max2 = m
         m = sensor.get_sensor_value()
+        output(self.P([m], []))
         while max2 <= m:
           max2 = m
           t2 = datetime.now().time().hour * 24 * 60 * 60 + datetime.now().time().minute * 60 * 60 + datetime.now().time().second + datetime.now().time().microsecond / 1000000
           m = sensor.get_sensor_value()
+          output(self.P([m], []))
       if max1 >= max2:  # Check that system oscillates constantly
         break
       self.kp += step_size
