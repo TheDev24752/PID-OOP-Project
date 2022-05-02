@@ -16,6 +16,7 @@ class PIDAutoTuning(PIDController):
     max2 = 0
     t1 = 0
     t2 = 0
+    output(self.P([min], []))
     while True:
       for i in range(2): # run system for 3 periods, so that it can settle into oscillation
         m = sensor.get_sensor_value()
