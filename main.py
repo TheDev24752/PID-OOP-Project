@@ -9,21 +9,26 @@ import time
 from PID_Auto_Tuning import PIDAutoTuning
 from SensorInput import SensorInput
 
-
 # define globals
 graph_y = 0
 setpoint = 100
+velocity = 0
+
+inputs = []
+times = []
 
 
 def noise():
     comp_proportional = -10
     comp_static = (time.time_ns() * 7 + 13) % 11
 
-    return comp_static + comp_proportional
+    return (comp_static + comp_proportional) / 10
 
-def change_y(change):
-    global graph_y
-    graph_y += change
+
+def change_vel(change):
+    global velocity, graph_y
+    velocity -= change * 0.01
+    graph_y += velocity
 
 
 def get_sensor_value():
@@ -32,7 +37,7 @@ def get_sensor_value():
 
 
 def change_set_point():
-    global setpoint, set_point_box, current_set_point
+    global setpoint, set_point_box, current_set_point, inputs, times
     try:
         # attempt to get the new setpoint
         new_point = set_point_box.get('1.0', 'end')
@@ -41,6 +46,9 @@ def change_set_point():
         set_point_box.delete('1.0', 'end')
         set_point_box.insert('end', "err")
         return
+
+    times = times[-2:]
+    inputs = inputs[-2:]
 
     setpoint = new_point
     new_point = f"{setpoint:.3f}"
@@ -54,10 +62,11 @@ def update():
     # all the code that controls the PID, Sensor, and other shenanigans that update every cycle go here
     graph_y += noise()
     inputs.append(graph_y)
-    times.append(time.process_time_ns())
+    times.append(time.process_time_ns() / (10**9))
     # TODO uncomment once the PID is fixed
-    # controller.setpoint = setpoint
-    # change_y(controller.PID(inputs, times))
+    controller.setpoint = setpoint
+    if len(inputs) > 1:
+        change_vel(controller.PID(inputs, times))
     return
 
 
@@ -71,24 +80,22 @@ def animate_graph(i):
 
     if len(inputs) < 100:
         x_vals = times
-        y_vals = inputs
+        y_vals = [i % 360 for i in inputs]
     else:
         # get the 100 most recent samples
         x_vals = times[-100:]
-        y_vals = inputs[-100:]
+        y_vals = [i % 360 for i in inputs[-100:]]
 
     # display-te!
     graph.clear()
     graph.plot(x_vals, y_vals)
+    graph.set_ylim([0, 360])
+
 
 sensor = SensorInput(get_sensor_value)
 controller = PIDAutoTuning(setpoint)
 
-# TODO uncomment once the PID is fixed
-# controller.ziegler_nichols_PID(sensor, change_y)
-
-inputs = []
-times = []
+controller.auto_tune_PID(sensor, change_vel)
 
 # region create window
 root = Tk()
@@ -99,8 +106,9 @@ ttk.Label(frm, text="Sensor output").grid(column=0, row=0)
 # endregion
 
 # region create graph
-fig = Figure(figsize=(5,5), dpi=75)
+fig = Figure(figsize=(5, 5), dpi=75)
 graph = fig.add_subplot(111)
+graph.set_title("heading vs time")
 
 canvas = FigureCanvasTkAgg(fig, frm)
 canvas.draw()

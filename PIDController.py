@@ -12,7 +12,7 @@ class PIDController:
   def PI(self, sensor_vals, times):
     integral = 0
     for i in range(len(sensor_vals) - 1):
-      integral += ((sensor_vals[i] - self.setpoint) + (sensor_vals[i + 1] - self.setpoint)) * (times[i] - times[i + 1]) / 2 # Area of a trapezoid
+      integral += ((sensor_vals[i] - self.setpoint) + (sensor_vals[i + 1] - self.setpoint)) * (times[i + 1] - times[i]) / 2 # Area of a trapezoid
     return self.P(sensor_vals, times) + (self.ki * integral)
   
   def PD(self, sensor_vals, times):
