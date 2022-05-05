@@ -63,7 +63,6 @@ def update():
     graph_y += noise()
     inputs.append(graph_y)
     times.append(time.process_time_ns() / (10**9))
-    # TODO uncomment once the PID is fixed
     controller.setpoint = setpoint
     if len(inputs) > 1:
         change_vel(controller.PID(inputs, times))

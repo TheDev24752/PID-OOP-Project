@@ -75,4 +75,3 @@ class PIDAutoTuning(PIDController):
     self.kp = 0.6 * ku
     self.ki = 1.2 * ku / tu
     self.kd = 0.075 * ku * tu
-    
