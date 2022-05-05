@@ -52,7 +52,7 @@ class PIDAutoTuning(PIDController):
         break
       self.kp += step_size
     return (self.kp, t2 - t1)
-
+  
   def auto_tune_P(self, sensor, output, step_size = 0.1, error_range = 0.1):
     self.ziegler_nichols(sensor, output, step_size, error_range)
     self.kp /= 2
@@ -72,3 +72,4 @@ class PIDAutoTuning(PIDController):
     self.kp = 0.6 * ku
     self.ki = 1.2 * ku / tu
     self.kd = 0.075 * ku * tu
+    
